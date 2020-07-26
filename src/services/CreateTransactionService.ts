@@ -1,4 +1,4 @@
-import { getRepository, getCustomRepository } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 
 import AppError from '../errors/AppError';
 import Transaction from '../models/Transaction';
@@ -19,17 +19,14 @@ class CreateTransactionService {
     type,
     category_title,
   }: Request): Promise<Transaction> {
-    const transactionsRepository = getRepository(Transaction);
-    const transactionsCustomRepository = getCustomRepository(
-      TransactionsRepository,
-    );
+    const transactionsRepository = getCustomRepository(TransactionsRepository);
     const categoriesRepository = new CategoriesRepository();
 
     const category = await categoriesRepository.findByTitleOrCreate(
       category_title,
     );
 
-    const balance = await transactionsCustomRepository.getBalance();
+    const balance = await transactionsRepository.getBalance();
 
     if (type === 'outcome' && value > balance.total) {
       throw new AppError('Outcome transaction is greater than total');
